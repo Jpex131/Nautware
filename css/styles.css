@@ -51,6 +51,7 @@ body {
     font-family: var(--font-main);
     -webkit-font-smoothing: antialiased;
     line-height: 1.6;
+    letter-spacing: -0.01em;
 }
 
 a {
@@ -198,11 +199,11 @@ nav ul li a:hover {
 }
 
 .hero h1 {
-    font-size: clamp(3rem, 6vw, 5rem);
-    font-weight: 500;
-    letter-spacing: -0.02em;
+    font-size: clamp(3.5rem, 7vw, 6rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
     margin-bottom: 16px;
-    line-height: 1.1;
+    line-height: 1.05;
 }
 
 .text-highlight {
@@ -279,9 +280,9 @@ nav ul li a:hover {
 }
 
 .showcase-title {
-    font-size: 2.8rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-size: 3rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
     line-height: 1.1;
     margin-bottom: 32px;
 }
@@ -531,8 +532,8 @@ nav ul li a:hover {
 
 .about-content h2 {
     font-size: 3rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-weight: 600;
+    letter-spacing: -0.03em;
     margin-bottom: 48px;
     color: var(--text-primary);
 }
@@ -544,17 +545,18 @@ nav ul li a:hover {
 }
 
 .about-card {
-    background: linear-gradient(135deg, rgba(20, 38, 64, 0.4), rgba(10, 22, 40, 0.6));
-    border: 1px solid var(--accent-100);
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
     padding: 32px;
-    backdrop-filter: blur(8px);
-    transition: transform 0.3s ease, border-color 0.3s ease;
+    backdrop-filter: blur(20px);
+    transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
 }
 
 .about-card:hover {
     transform: translateY(-5px);
-    border-color: var(--accent-500);
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.04);
 }
 
 .about-card h3 {
@@ -609,9 +611,9 @@ nav ul li a:hover {
 }
 
 .contact-info h2 {
-    font-size: 2.8rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-size: 3rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
     margin-bottom: 24px;
     color: var(--text-primary);
 }
