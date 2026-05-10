@@ -45,15 +45,15 @@
     <section id="solutions" class="showcase">
 
                 <div class="showcase-left">
-            <span class="showcase-label">Hardware R&D Division</span>
-            <h2 class="showcase-title">Marciana</h2>
+            <span class="showcase-label">Enterprise Suite</span>
+            <h2 class="showcase-title">Core Modules</h2>
             <ul class="showcase-tags" id="showcase-tags">
-                <li class="active" data-category="heavy-lift">Heavy Lift</li>
-                <li data-category="agility">Agility</li>
-                <li data-category="compact">Compact</li>
-                <li data-category="endurance">Endurance</li>
+                <li class="active" data-category="inventory">Inventory Management</li>
+                <li data-category="services">Service Management</li>
+                <li data-category="finance">Financial Analytics</li>
+                <li data-category="ai">AI Implementation</li>
             </ul>
-            <p class="showcase-subtitle">Project Leviathan</p>
+            <p class="showcase-subtitle">NAUT Platform</p>
             <button class="btn-outline">Consult Our Engineering Team</button>
         </div>
 
@@ -69,16 +69,14 @@
                 <span class="coord" style="top:82%;left:50%">1390</span>
                 <span class="coord" style="top:88%;left:80%">944</span>
 
-                <img src="assets/images/base-marciana.png" alt="Base Marciana" class="base-marciana">
+                <img src="assets/images/inventory_module.png" alt="NAUT Module" class="base-marciana" id="showcase-img">
                 <span class="orbit-hint">← Drag to orbit →</span>
             </div>
         </div>
 
                 <div class="showcase-right">
             <p class="showcase-desc" id="showcase-desc">
-                We engineer custom software, complex e-commerce architectures, and AI integrations for enterprise clients. 
-                <br><br>
-                This digital foundation drives our physical R&D, such as the Marciana vehicle, designed for precise actuation and heavy payloads across planetary-scale construction sites.
+                Product Manejo — The asset tracking system for managing physical goods, raw materials, and product sales.<br><br>Features real-time stock level monitoring, dynamic cost of goods sold calculations, and automated supplier orders.
             </p>
 
             <div class="specs-panel">
@@ -88,28 +86,28 @@
                 </button>
                 <div class="specs-body open" id="specs-body">
                     <div class="spec-row">
-                        <div class="spec-label" id="spec-label-0">Endurance</div>
-                        <div class="spec-value" id="spec-value-0">Up to 12 hrs</div>
+                        <div class="spec-label" id="spec-label-0">Feature</div>
+                        <div class="spec-value" id="spec-value-0">Real-time Stock</div>
                     </div>
                     <div class="spec-row">
-                        <div class="spec-label" id="spec-label-1">Depth</div>
-                        <div class="spec-value" id="spec-value-1">5,000 ft</div>
+                        <div class="spec-label" id="spec-label-1">Integration</div>
+                        <div class="spec-value" id="spec-value-1">Finance Module</div>
                     </div>
                     <div class="spec-row">
-                        <div class="spec-label" id="spec-label-2">Range</div>
-                        <div class="spec-value" id="spec-value-2">Up to 12 nmi</div>
+                        <div class="spec-label" id="spec-label-2">Capacity</div>
+                        <div class="spec-value" id="spec-value-2">Unlimited SKUs</div>
                     </div>
                     <div class="spec-row">
-                        <div class="spec-label" id="spec-label-3">Length</div>
-                        <div class="spec-value" id="spec-value-3">80 inches</div>
+                        <div class="spec-label" id="spec-label-3">Platform</div>
+                        <div class="spec-value" id="spec-value-3">Cloud Native</div>
                     </div>
                     <div class="spec-row">
-                        <div class="spec-label" id="spec-label-4">DoF</div>
-                        <div class="spec-value" id="spec-value-4">Fully Independent 6</div>
+                        <div class="spec-label" id="spec-label-4">Security</div>
+                        <div class="spec-value" id="spec-value-4">End-to-end Encryption</div>
                     </div>
                     <div class="spec-row">
-                        <div class="spec-label" id="spec-label-5">Payload</div>
-                        <div class="spec-value" id="spec-value-5">Up to 250 lbs</div>
+                        <div class="spec-label" id="spec-label-5">Automation</div>
+                        <div class="spec-value" id="spec-value-5">Supplier API Sync</div>
                     </div>
                 </div>
             </div>
@@ -297,48 +295,52 @@
 
         // --- Category data ---
         const categoryData = {
-            'heavy-lift': {
-                desc: 'We engineer custom software, complex e-commerce architectures, and AI integrations for enterprise clients.<br><br>This digital foundation drives our physical R&D, such as the Marciana vehicle, designed for precise actuation and heavy payloads across planetary-scale construction sites.',
+            'inventory': {
+                desc: 'Product Manejo — The asset tracking system for managing physical goods, raw materials, and product sales.<br><br>Features real-time stock level monitoring, dynamic cost of goods sold calculations, and automated supplier orders.',
+                image: 'assets/images/inventory_module.png',
                 specs: [
-                    { label: 'Endurance',  value: 'Up to 12 hrs' },
-                    { label: 'Depth',      value: '5,000 ft' },
-                    { label: 'Range',      value: 'Up to 12 nmi' },
-                    { label: 'Length',     value: '80 inches' },
-                    { label: 'DoF',        value: 'Fully Independent 6' },
-                    { label: 'Payload',    value: 'Up to 250 lbs' }
+                    { label: 'Feature',  value: 'Real-time Stock' },
+                    { label: 'Integration',  value: 'Finance Module' },
+                    { label: 'Capacity',      value: 'Unlimited SKUs' },
+                    { label: 'Platform',     value: 'Cloud Native' },
+                    { label: 'Security',        value: 'End-to-end Encryption' },
+                    { label: 'Automation',    value: 'Supplier API Sync' }
                 ]
             },
-            'agility': {
-                desc: 'Our digital infrastructure supports rapid scaling and complex operational logic for modern businesses.<br><br>In the physical realm, this technology translates to autonomous maneuvering and high-speed repositioning in complex terrain.',
+            'services': {
+                desc: 'Service Management — The operational scheduling engine designed to manage logistical booking and provider assignments.<br><br>Includes interactive calendars for blocking dates, managing recurring operations, and deep integration with our ledger system.',
+                image: 'assets/images/service_module.png',
                 specs: [
-                    { label: 'Endurance',  value: 'Up to 6 hrs' },
-                    { label: 'Max Speed',  value: '8.5 knots' },
-                    { label: 'Range',      value: 'Up to 18 nmi' },
-                    { label: 'Length',     value: '52 inches' },
-                    { label: 'DoF',        value: 'Fully Independent 6' },
-                    { label: 'Turn Radius', value: '< 2 ft' }
+                    { label: 'Feature',  value: 'Interactive Calendar' },
+                    { label: 'Logistics',  value: 'Provider Assignment' },
+                    { label: 'Integration',      value: 'Inventory Deductions' },
+                    { label: 'Platform',     value: 'Cloud Native' },
+                    { label: 'Time Tracking',        value: 'Automated Billing' },
+                    { label: 'Scale', value: 'Enterprise Level' }
                 ]
             },
-            'compact': {
-                desc: 'We build lightweight, highly efficient APIs and digital networks that deploy instantly.<br><br>This philosophy mirrors our hardware R&D: designing man-portable physical systems with a minimal deployment footprint.',
+            'finance': {
+                desc: 'Finance Analitica — The financial heartbeat of the platform. A passive aggregator that listens to activities across the ecosystem to generate real-time financial insights.<br><br>Track operating income, expenditure, and calculate net profit dynamically.',
+                image: 'assets/images/finance_module.png',
                 specs: [
-                    { label: 'Endurance',  value: 'Up to 4 hrs' },
-                    { label: 'Depth',      value: '1,000 ft' },
-                    { label: 'Range',      value: 'Up to 5 nmi' },
-                    { label: 'Length',     value: '32 inches' },
-                    { label: 'Weight',     value: '18 lbs' },
-                    { label: 'Payload',    value: 'Up to 15 lbs' }
+                    { label: 'Feature',  value: 'Real-time Dashboards' },
+                    { label: 'Automation',  value: 'Ledger Updates' },
+                    { label: 'Analytics',      value: 'Cash Flow Trends' },
+                    { label: 'Compliance',     value: 'Enterprise Grade' },
+                    { label: 'Scale',     value: 'Multi-Entity Support' },
+                    { label: 'Export',    value: 'Automated Reporting' }
                 ]
             },
-            'endurance': {
-                desc: 'Our enterprise software solutions are engineered for maximum operational uptime and sustained performance.<br><br>In tandem, NAUT Labs builds autonomous physical systems featuring advanced power management for long-duration tasks.',
+            'ai': {
+                desc: 'AI Implementation — Our advanced predictive engine that analyzes historical data to forecast trends and optimize workflows.<br><br>From anticipating inventory shortages to dynamically adjusting service schedules, the AI core brings true autonomy to your business operations.',
+                image: 'assets/images/ai_module.png',
                 specs: [
-                    { label: 'Endurance',  value: 'Up to 48 hrs' },
-                    { label: 'Depth',      value: '3,000 ft' },
-                    { label: 'Range',      value: 'Up to 60 nmi' },
-                    { label: 'Length',     value: '96 inches' },
-                    { label: 'DoF',        value: 'Fully Independent 4' },
-                    { label: 'Payload',    value: 'Up to 120 lbs' }
+                    { label: 'Core',  value: 'Predictive Modeling' },
+                    { label: 'Optimization',  value: 'Dynamic Scheduling' },
+                    { label: 'Analysis',      value: 'Pattern Recognition' },
+                    { label: 'Processing',     value: 'Quantum-Ready' },
+                    { label: 'Security',        value: 'Isolated Instances' },
+                    { label: 'Learning',    value: 'Continuous Feedback' }
                 ]
             }
         };
@@ -359,6 +361,10 @@
 
                 // Update description
                 descEl.innerHTML = data.desc;
+
+                // Update Image
+                const imgEl = document.getElementById('showcase-img');
+                if (imgEl && data.image) imgEl.src = data.image;
 
                 // Update spec rows
                 data.specs.forEach((spec, i) => {
