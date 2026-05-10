@@ -362,9 +362,15 @@
                 // Update description
                 descEl.innerHTML = data.desc;
 
-                // Update Image
+                // Update Image with animation
                 const imgEl = document.getElementById('showcase-img');
-                if (imgEl && data.image) imgEl.src = data.image;
+                if (imgEl && data.image && !imgEl.src.endsWith(data.image)) {
+                    imgEl.classList.add('fade-out');
+                    setTimeout(() => {
+                        imgEl.src = data.image;
+                        setTimeout(() => imgEl.classList.remove('fade-out'), 50);
+                    }, 300); // Wait for fade out transition
+                }
 
                 // Update spec rows
                 data.specs.forEach((spec, i) => {
@@ -376,9 +382,7 @@
                     }
                 });
 
-                // Ensure specs are expanded
-                specsToggle.setAttribute('aria-expanded', 'true');
-                specsBody.classList.add('open');
+                // Intentionally preserving the current open/closed state of the specs panel.
             });
         });
         // --- AUDIO PLAYER LOGIC ---

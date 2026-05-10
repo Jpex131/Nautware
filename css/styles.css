@@ -393,6 +393,12 @@ nav ul li a:hover {
     clip-path: polygon(0 0, 100% 0, 100% 75%, 0 75%);
     mix-blend-mode: lighten;
     filter: drop-shadow(0 8px 40px var(--glow));
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.base-marciana.fade-out {
+    opacity: 0;
+    transform: scale(0.97);
 }
 
 .orbit-hint {
