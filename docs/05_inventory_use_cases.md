@@ -1,6 +1,6 @@
 # Product Management (Inventory) - Use Cases
 
-This document outlines the core use cases and actors for the "Product Manejo" inventory module of the Naut Platform.
+This document outlines the core use cases and actors for the "Product Manejo" inventory module of Nautware.
 
 ## Actors
 - **Cliente (Customer)**: End-user browsing products and making purchases.
@@ -26,7 +26,7 @@ flowchart LR
     PaymentSys{{Payment System}}:::system
 
     %% Frontera del Sistema
-    subgraph Naut_Platform ["Naut Platform: Product Management (Inventory)"]
+    subgraph Naut_Platform ["Nautware: Product Management (Inventory)"]
         direction TB
         
         %% Casos de Uso del Cliente

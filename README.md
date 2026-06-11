@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="assets/images/naut_logo.png" alt="NAUT Logo" height="80">
+  <img src="assets/images/naut_logo.png" alt="Nautware Logo" height="80">
   <br/>
-  <h1>NAUT ERP Platform</h1>
+  <h1>Nautware ERP Platform</h1>
   <p><strong>A unified, modular Enterprise Resource Planning (ERP) suite.</strong></p>
 </div>
 
@@ -9,7 +9,7 @@
 
 ## 🚀 Project Vision
 
-The NAUT platform is a cohesive, web-based Enterprise Resource Planning (ERP) suite. Built on a **Modular Monolith architecture**, the application integrates specialized business management tools under an immersive, aerospace and terraforming-inspired "Dark Aerospace" aesthetic.
+Nautware is a cohesive, web-based Enterprise Resource Planning (ERP) suite. Built on a **Modular Monolith architecture**, the application integrates specialized business management tools under an immersive, aerospace and terraforming-inspired "Dark Aerospace" aesthetic.
 
 Our goal is to seamlessly automate business operations—such as finance tracking, service booking, and inventory management—while maintaining an elite, cinematic, and highly interactive user experience.
 
@@ -39,6 +39,8 @@ The operational scheduling engine designed to manage logistical booking and prov
 ### 3. Product Manejo (Inventory Management)
 The asset tracking system for managing physical goods, raw materials, and product sales.
 - **Functions:** Monitors real-time stock levels, calculates cost of goods sold (COGS), and manages supplier orders.
+- **Actors:** Cliente (Customer), Administrador de Inventario (Admin), Proveedor (Supplier).
+- **Use Cases:** Explores catalog, manages cart, checkout, tracks orders, manages stock/inventory, and supplier orders. See [`docs/05_inventory_use_cases.md`](docs/05_inventory_use_cases.md) for detailed workflows.
 - **Integration:** Dynamically deducts from inventory when jobs in the Service module are executed. Purchasing materials logs an expense directly in the Finance module.
 
 ## 🏗 System Architecture
@@ -46,7 +48,7 @@ The asset tracking system for managing physical goods, raw materials, and produc
 The platform structures logic using the Model-View-Controller (MVC) pattern. Data persistence is managed via a relational database to facilitate module cross-talk.
 
 ```text
-naut_platform/
+nautware/
 ├── core/                       # The Shared Hub
 │   ├── database/               # Relational DB Config
 │   ├── routes/                 # Global routing (Auth, Dashboard)
