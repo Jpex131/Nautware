@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAUT | ERP Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        /* Modern Glassmorphic Dashboard Styles */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 120px auto 48px;
+            padding: 0 24px;
+            min-height: 60vh;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--accent-100);
+            padding-bottom: 24px;
+        }
+        .dashboard-header h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-surface);
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: 1px solid var(--accent-100);
+            font-size: 0.9rem;
+        }
+        .badge-avatar {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-500);
+            box-shadow: 0 0 8px var(--accent-500);
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .card-erp {
+            background: var(--bg-surface);
+            border: 1px solid var(--accent-100);
+            border-radius: 8px;
+            padding: 32px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 220px;
+        }
+        .card-erp:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-500);
+            box-shadow: 0 8px 24px rgba(76, 154, 255, 0.15);
+        }
+        .card-icon {
+            font-size: 1.8rem;
+            color: var(--accent-500);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        .card-action {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-500);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-action:hover {
+            color: var(--accent-600);
+        }
+        /* Auth forms style */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            position: relative;
+            background: var(--bg-void);
+            overflow: hidden;
+        }
+        .auth-bg-glow {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(76, 154, 255, 0.1) 0%, transparent 70%);
+            z-index: 0;
+        }
+        .auth-card {
+            background: rgba(28, 36, 49, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--accent-100);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 420px;
+            padding: 48px;
+            z-index: 1;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .auth-logo img {
+            height: 48px;
+            margin-bottom: 12px;
+        }
+        .auth-logo h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .auth-error {
+            background: rgba(245, 101, 101, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        .auth-footer-links {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .auth-footer-links a {
+            color: var(--accent-500);
+            font-weight: 500;
+        }
+        .auth-footer-links a:hover {
+            color: var(--accent-600);
+        }
+        /* Top Navigation inside ERP views */
+        .erp-nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 48px;
+            background: var(--bg-void);
+            border-bottom: 1px solid var(--accent-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+        .erp-nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .erp-nav-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+            align-items: center;
+        }
+        .erp-nav-links a {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .erp-nav-links a.active, .erp-nav-links a:hover {
+            color: var(--text-primary);
+        }
+        .btn-logout {
+            color: var(--danger) !important;
+            font-weight: 600 !important;
+        }
+        /* Back link */
+        .back-link {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-link:hover {
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>

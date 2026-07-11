@@ -1,0 +1,36 @@
+{
+  "name": "terr",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">   <img src=\"assets/images/naut_logo.png\" alt=\"Nautware Logo\" height=\"80\">   <br/>   <h1>Nautware ERP Platform</h1>   <p><strong>A unified, modular Enterprise Resource Planning (ERP) suite.</strong></p> </div>",
+  "main": "server.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jpex131/naut-landing-page.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jpex131/naut-landing-page/issues"
+  },
+  "homepage": "https://github.com/Jpex131/naut-landing-page#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.4.2",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "mysql2": "^3.22.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

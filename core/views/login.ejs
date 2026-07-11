@@ -1,0 +1,45 @@
+<%- include('partials/header') %>
+
+<div class="auth-container">
+    <div class="auth-bg-glow"></div>
+    <div class="auth-card">
+        <a href="/" class="back-link">&larr; Back to Main Site</a>
+        
+        <div class="auth-logo">
+            <img src="/assets/images/naut_logo.png" alt="Naut Logo">
+            <h2>Access ERP Portal</h2>
+        </div>
+
+        <% if (error) { %>
+            <div class="auth-error">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <form class="auth-form" action="/auth/login" method="POST">
+            <div class="form-group">
+                <label for="email">Work Email</label>
+                <input type="email" id="email" name="email" placeholder="jane@naut.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Security Password</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-primary" style="margin-top: 12px; width: 100%;">Establish Link</button>
+        </form>
+
+        <div style="margin-top: 24px; padding: 12px; background: rgba(5, 10, 20, 0.4); border: 1px dashed var(--accent-100); border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary);">
+            <strong>Local Test Account:</strong><br>
+            Email: <code style="color: var(--accent-500);">admin@naut.com</code><br>
+            Password: <code style="color: var(--accent-500);">admin123</code>
+        </div>
+
+        <div class="auth-footer-links">
+            Don't have access yet? <a href="/register">Register Portal Account</a>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

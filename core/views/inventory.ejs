@@ -1,0 +1,57 @@
+<%- include('partials/header') %>
+
+<nav class="erp-nav">
+    <div class="erp-nav-logo">
+        <img src="/assets/images/naut_logo.png" alt="Naut Logo" style="height: 32px;">
+        <span style="font-weight: 700; letter-spacing: 2px; font-size: 1.1rem; text-transform: uppercase;">Nautware</span>
+    </div>
+    <ul class="erp-nav-links">
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/finance">Finance</a></li>
+        <li><a href="/services">Services</a></li>
+        <li><a href="/inventory" class="active">Inventory</a></li>
+        <li><a href="/auth/logout" class="btn-logout">Disconnect</a></li>
+    </ul>
+</nav>
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <div>
+            <h1>Product Manejo</h1>
+            <p style="color: var(--text-secondary); margin-top: 4px;">Asset cataloging, stock depletion, and supplier portal spokes.</p>
+        </div>
+        <div class="user-badge">
+            <span class="badge-avatar"></span>
+            <span>Operator: <%= username %></span>
+        </div>
+    </div>
+
+    <a href="/dashboard" class="back-link">&larr; Back to Command Dashboard</a>
+
+    <!-- Placeholder statistics dashboard -->
+    <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 24px;">
+        <div class="card-erp" style="min-height: 120px; padding: 24px;">
+            <div>
+                <h4 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Asset SKUs Listed</h4>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--accent-500); margin-top: 8px;">0 Items</div>
+            </div>
+        </div>
+        <div class="card-erp" style="min-height: 120px; padding: 24px;">
+            <div>
+                <h4 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Critical Alerts</h4>
+                <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-top: 8px;">0 Restock suggestions</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-erp" style="min-height: 200px;">
+        <div>
+            <div class="card-icon">🏗️</div>
+            <h3 class="card-title">Inventory Database Connection Pending</h3>
+            <p class="card-desc">The Product Manejo module has initialized successfully. It is currently waiting for Phase 1B: MySQL schema migration to be executed. Once the database connection pool is active, catalog tables and supply logs will automatically populate below.</p>
+        </div>
+        <div class="card-action" style="color: var(--text-muted); cursor: not-allowed;">Awaiting DB Migration &times;</div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
