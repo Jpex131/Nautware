@@ -615,6 +615,127 @@ supplier_id INT NULL,  -- Only populated if B2B
 
 ---
 
+## 11. CRITICAL IMPLEMENTATION DECISIONS (RECOMMENDED)
+
+### A. Payment gateway strategy for launch
+
+For the initial release, the most practical configuration is a hybrid model:
+
+- Support an internal wallet / platform ledger for bookkeeping.
+- Support bank transfer or manual deposit for easier compliance and lower operational friction.
+- Add a stablecoin option such as USDC or USDT for fast settlement and international buyers/sellers.
+- Avoid making BTC the primary launch method because it introduces volatility, wallet custody complexity, and a worse user experience for most customers.
+
+Recommended launch order:
+1. Internal wallet + bank transfer / manual deposit
+2. Stablecoin (USDC/USDT)
+3. Credit card / Stripe-style processor later if the business needs higher conversion
+
+This design is similar to how marketplace platforms such as Shopify, Stripe Connect, Etsy, and Mercado Libre operate: the platform receives funds, records them in an internal ledger, then releases them to sellers after confirmation and settlement rules are met.
+
+### B. Wallet and settlement handling
+
+The app should not rely on the raw bank account or crypto wallet balance as the only truth. Instead, use a two-layer balance model:
+
+- Pending / escrow balance: money received from a customer but not yet released to the seller.
+- Available balance: money that has been confirmed, released, and is now visible in the seller’s app balance.
+
+Recommended approach:
+- The platform receives funds into a platform-controlled account or custodial wallet.
+- The database stores the movement as financial ledger entries.
+- The seller’s visible balance is a book balance derived from the ledger, not a direct reflection of the bank balance.
+- Only after payment confirmation and release rules are met does the seller’s balance become available.
+
+In practical terms:
+- Customer pays → payment status becomes HELD / PENDING
+- Delivery or service completion occurs → payment can be released
+- Seller sees “pending” funds until release, then “available” funds after release
+
+### C. Fee model recommendation
+
+For launch, a simple and transparent model is best:
+
+- Use a base platform commission of 5% for standard B2C marketplace orders.
+- Keep the fee configurable per payment method in the gateway settings.
+- Example rates:
+  - Credit card: 3% to 4% + fixed fee
+  - Stablecoin: 1% to 2%
+  - Bank transfer / internal wallet: 0% to 1%
+
+The simplest implementation rule is:
+
+$$
+platform\_fee = fixed\_fee + (gross\_amount \times commission\_rate)
+$$
+
+This keeps the system easy to understand while still allowing different costs by payment method.
+
+Recommended schema enhancement:
+
+```sql
+ALTER TABLE payment_gateways
+ADD COLUMN fixed_fee_amount DECIMAL(10,2) DEFAULT 0.00,
+ADD COLUMN settlement_delay_days INT DEFAULT 0,
+ADD COLUMN payout_currency VARCHAR(10) DEFAULT 'USD';
+```
+
+### D. What is B2B?
+
+B2B means Business-to-Business. In this platform, it refers to a seller buying goods or supplies from another seller for wholesale or replenishment purposes.
+
+Example:
+- Seller A buys inventory from Seller B to restock their shop.
+- Seller A is not the end customer; they are a business buyer.
+
+This is different from B2C, where a customer buys from a seller for personal use.
+
+### E. B2B order model recommendation
+
+Recommendation: keep a separate `supplier_orders` table for launch.
+
+Why this is better than overloading `orders` with a flag:
+- B2B has different business rules from customer checkout.
+- B2B flows typically involve supplier selection, restocking, wholesale pricing, and inventory replenishment.
+- The data model stays clearer and easier to maintain.
+
+Use:
+- `orders` for customer-facing marketplace purchases (B2C)
+- `supplier_orders` for seller-to-seller wholesale purchases (B2B)
+
+This is the cleaner approach for the current MVP.
+
+### F. KYC / seller verification recommendation
+
+The seller verification model should be tiered:
+
+- Email verification: required to create and activate a seller account.
+- Full identity verification (KYC): required before a seller can receive payouts or withdraw funds.
+- Optional business verification: recommended for larger volume sellers or B2B suppliers.
+
+Recommended rule:
+- Sellers can list products and receive orders after email verification.
+- Sellers can only withdraw or receive payouts after KYC approval.
+
+This reduces fraud while keeping the onboarding experience simple.
+
+Recommended schema extension:
+
+```sql
+CREATE TABLE seller_verifications (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
+  verification_type ENUM('EMAIL', 'IDENTITY', 'ADDRESS', 'BANK_ACCOUNT') DEFAULT 'EMAIL',
+  status ENUM('PENDING', 'APPROVED', 'REJECTED', 'EXPIRED') DEFAULT 'PENDING',
+  submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  reviewed_at TIMESTAMP NULL,
+  notes TEXT,
+  documents_json JSON,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+```
+
+---
+
 ## KEY BUSINESS LOGIC RULES
 
 ### Payment Flow Trigger
