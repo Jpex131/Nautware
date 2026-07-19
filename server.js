@@ -2,6 +2,8 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const dotenv = require('dotenv');
+const bcrypt = require('bcrypt');
+const pool = require('./core/database/db');
 
 // Load environment variables
 dotenv.config();
@@ -61,20 +63,53 @@ app.get('/register', (req, res) => {
 });
 
 // Mock post login / register handlers for session setup/testing
-app.post('/auth/login', (req, res) => {
+app.post('/auth/login', async (req, res) => {
     const { email, password } = req.body;
-    // Basic mock authentication for testing Phase 1A server foundation
-    if (email === 'admin@naut.com' && password === 'admin123') {
-        req.session.userId = 1;
-        req.session.username = 'Admin';
-        return res.redirect('/dashboard');
+    try {
+        const [rows] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
+        if (rows.length === 0) {
+            return res.render('login', { error: 'Invalid credentials.' });
+        }
+        
+        const user = rows[0];
+        const match = await bcrypt.compare(password, user.password_hash);
+        
+        if (match) {
+            req.session.userId = user.id;
+            req.session.username = user.first_name || email.split('@')[0];
+            return res.redirect('/dashboard');
+        } else {
+            return res.render('login', { error: 'Invalid credentials.' });
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        res.render('login', { error: 'An internal server error occurred.' });
     }
-    res.render('login', { error: 'Invalid credentials. Use admin@naut.com / admin123 for testing.' });
 });
 
-app.post('/auth/register', (req, res) => {
-    // Mock registration logic
-    res.redirect('/login');
+app.post('/auth/register', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        // Check if user already exists
+        const [existing] = await pool.execute('SELECT id FROM users WHERE email = ?', [email]);
+        if (existing.length > 0) {
+            return res.render('register', { error: 'Email is already registered.' });
+        }
+        
+        // Hash password and create user
+        const saltRounds = 10;
+        const passwordHash = await bcrypt.hash(password, saltRounds);
+        
+        await pool.execute(
+            'INSERT INTO users (email, password_hash) VALUES (?, ?)',
+            [email, passwordHash]
+        );
+        
+        res.redirect('/login');
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.render('register', { error: 'An error occurred during registration.' });
+    }
 });
 
 // Logout handler
