@@ -136,10 +136,9 @@ app.get('/services', requireAuth, (req, res) => {
     res.render('services', { username: req.session.username });
 });
 
-// Product Manejo inventory
-app.get('/inventory', requireAuth, (req, res) => {
-    res.render('inventory', { username: req.session.username });
-});
+// Product Manejo inventory (Modular Router)
+const inventoryRoutes = require('./modules/inventory/routes');
+app.use('/inventory', inventoryRoutes);
 
 // --- SYSTEM ROUTES ---
 
