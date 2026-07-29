@@ -210,7 +210,7 @@
     <% } %>
 
     <!-- MARKETPLACE LAYOUT -->
-    <div id="marketplace" style="<%= shop ? 'display: none;' : 'display: grid;' %> grid-template-columns: 240px 1fr; gap: 32px; align-items: start;">
+    <div id="marketplace" style="display: <%= shop ? 'none' : 'grid' %>; grid-template-columns: 240px 1fr; gap: 32px; align-items: start;">
         
         <!-- LEFT COLUMN: Categories & Toggles -->
         <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 24px; position: sticky; top: 100px;">
@@ -313,7 +313,11 @@
                             <div class="card-erp mkt-product-card" 
                                  data-category="<%= product.category %>" 
                                  data-name="<%= product.name %>"
-                                 onclick="openProductModal('<%= product.name.replace(/'/g, "\\'") %>', '<%= product.price %>', '<%= product.description.replace(/(\r\n|\n|\r)/gm, " ").replace(/'/g, "\\'") %>', '<%= imgUrl %>', '<%= product.shop_name.replace(/'/g, "\\'") %>')"
+                                 data-price="<%= product.price %>"
+                                 data-desc="<%= product.description %>"
+                                 data-img="<%= imgUrl %>"
+                                 data-shop="<%= product.shop_name %>"
+                                 onclick="openModalFromCard(this)"
                                  style="padding: 0; overflow: hidden; display: flex; flex-direction: column; width: 100%; height: 340px; background: rgba(30,30,45,0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer; transition: border-color 0.2s, transform 0.2s;">
                                 
                                 <div style="height: 160px; width: 100%; background: #1a1a24; overflow: hidden;">
@@ -323,7 +327,7 @@
                                     <div style="font-weight: 600; font-size: 1.05rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<%= product.name %>"><%= product.name %></div>
                                     <div style="color: var(--accent-500); font-weight: 700; margin-top: 4px; font-size: 1.1rem;">$<%= product.price %></div>
                                     
-                                    <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 8px; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                    <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 8px; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                                         <%= product.description %>
                                     </div>
                                     
@@ -355,7 +359,7 @@
                                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                                 </div>
                                 <div style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary); margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;"><%= mShop.shop_name %></div>
-                                <div style="color: var(--text-muted); font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                <div style="color: var(--text-muted); font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                                     <%= mShop.shop_description || 'No description provided.' %>
                                 </div>
                             </div>
@@ -404,12 +408,12 @@
 </div>
 
 <script>
-    function openProductModal(name, price, desc, img, shop) {
-        document.getElementById('modal-name').innerText = name;
-        document.getElementById('modal-price').innerText = '$' + price;
-        document.getElementById('modal-desc').innerText = desc;
-        document.getElementById('modal-img').src = img;
-        document.getElementById('modal-shop').innerText = shop;
+    function openModalFromCard(el) {
+        document.getElementById('modal-name').innerText = el.dataset.name;
+        document.getElementById('modal-price').innerText = '$' + el.dataset.price;
+        document.getElementById('modal-desc').innerText = el.dataset.desc;
+        document.getElementById('modal-img').src = el.dataset.img;
+        document.getElementById('modal-shop').innerText = el.dataset.shop;
         document.getElementById('product-modal-overlay').style.display = 'flex';
     }
 </script>
