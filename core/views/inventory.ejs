@@ -210,7 +210,11 @@
     <% } %>
 
     <!-- MARKETPLACE LAYOUT -->
-    <div id="marketplace" style="display: <%= shop ? 'none' : 'grid' %>; grid-template-columns: 240px 1fr; gap: 32px; align-items: start;">
+    <% if (shop) { %>
+    <div id="marketplace" style="display: none; grid-template-columns: 240px 1fr; gap: 32px; align-items: start;">
+    <% } else { %>
+    <div id="marketplace" style="display: grid; grid-template-columns: 240px 1fr; gap: 32px; align-items: start;">
+    <% } %>
         
         <!-- LEFT COLUMN: Categories & Toggles -->
         <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 24px; position: sticky; top: 100px;">
