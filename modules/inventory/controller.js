@@ -8,14 +8,24 @@ const InventoryController = {
             const shop = await InventoryModel.getShopByUserId(userId);
             
             let products = [];
+            let marketplaceProducts = [];
+            let marketplaceShops = [];
+
             if (shop) {
                 products = await InventoryModel.getProductsByShop(shop.id);
+                marketplaceProducts = await InventoryModel.getAllActiveProducts(shop.id);
+                marketplaceShops = await InventoryModel.getAllActiveShops(userId);
+            } else {
+                marketplaceProducts = await InventoryModel.getAllActiveProducts();
+                marketplaceShops = await InventoryModel.getAllActiveShops(userId);
             }
             
             res.render('inventory', { 
                 username: req.session.username,
                 shop,
                 products,
+                marketplaceProducts,
+                marketplaceShops,
                 error: null,
                 success: null
             });
@@ -50,11 +60,11 @@ const InventoryController = {
                 return res.status(403).send('You must create a shop first.');
             }
 
-            const { name, description, category, price, stock_level } = req.body;
+            const { name, description, category, price, stock_level, image_url } = req.body;
             const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
             
             await InventoryModel.createProduct(shop.id, {
-                name, slug, description, category, price, stock_level
+                name, slug, description, category, price, stock_level, image_url
             });
             
             res.redirect('/inventory');

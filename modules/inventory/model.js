@@ -22,20 +22,29 @@ class InventoryModel {
     // --- SELLER PRODUCT MANAGEMENT ---
 
     static async createProduct(shopId, data) {
-        const { name, slug, description, category, price, stock_level } = data;
+        const { name, slug, description, category, price, stock_level, image_url } = data;
+        const imagesJson = image_url ? JSON.stringify([image_url]) : JSON.stringify([]);
         const [result] = await pool.execute(
-            'INSERT INTO products (shop_id, name, slug, description, category, price, stock_level) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [shopId, name, slug, description, category, price, stock_level || 0]
+            'INSERT INTO products (shop_id, name, slug, description, category, price, stock_level, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [shopId, name, slug, description, category, price, stock_level || 0, imagesJson]
         );
         return result.insertId;
     }
 
     static async updateProduct(productId, shopId, data) {
-        const { name, description, category, price } = data;
-        const [result] = await pool.execute(
-            'UPDATE products SET name = ?, description = ?, category = ?, price = ? WHERE id = ? AND shop_id = ?',
-            [name, description, category, price, productId, shopId]
-        );
+        const { name, description, category, price, image_url, stock_level } = data;
+        let sql = 'UPDATE products SET name = ?, description = ?, category = ?, price = ?, stock_level = ?';
+        let params = [name, description, category, price, stock_level || 0];
+
+        if (image_url !== undefined) {
+            sql += ', images = ?';
+            params.push(image_url ? JSON.stringify([image_url]) : JSON.stringify([]));
+        }
+
+        sql += ' WHERE id = ? AND shop_id = ?';
+        params.push(productId, shopId);
+
+        const [result] = await pool.execute(sql, params);
         return result.affectedRows > 0;
     }
 
@@ -71,6 +80,34 @@ class InventoryModel {
             [productId]
         );
         return rows.length > 0 ? rows[0] : null;
+    }
+
+    static async getAllActiveProducts(excludeShopId = null) {
+        let sql = 'SELECT p.*, s.shop_name FROM products p JOIN shops s ON p.shop_id = s.id WHERE p.is_active = TRUE';
+        const params = [];
+        
+        if (excludeShopId) {
+            sql += ' AND p.shop_id != ?';
+            params.push(excludeShopId);
+        }
+        
+        sql += ' ORDER BY p.created_at DESC';
+        const [rows] = await pool.execute(sql, params);
+        return rows;
+    }
+
+    static async getAllActiveShops(excludeUserId = null) {
+        let sql = 'SELECT * FROM shops';
+        const params = [];
+        
+        if (excludeUserId) {
+            sql += ' WHERE user_id != ?';
+            params.push(excludeUserId);
+        }
+        
+        sql += ' ORDER BY rating_average DESC, created_at DESC';
+        const [rows] = await pool.execute(sql, params);
+        return rows;
     }
 
     static async searchProducts(query, category, sort) {
