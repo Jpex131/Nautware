@@ -3,45 +3,41 @@
 **Author:** J. Pablo Velasquez
 
 ## 1. Executive Summary & Vision
-The Naut platform is designed as a unified, web-based Enterprise Resource Planning (ERP) suite. Built with a Modular Monolith architecture, the application integrates specialized business management tools under a cohesive aerospace and terraforming-inspired interface. The initial launch focuses on establishing three core pillars that operate independently but share a centralized database to automate business operations seamlessly.
+Nautware is a multi-sided marketplace platform designed to connect buyers and sellers within a single Dark Aerospace operating environment. The system is built as a modular monolith with a shared core that supports shops, listings, orders, payments, and inventory visibility across the marketplace.
 
 ## 2. Core Modules (The Spokes)
 
-### A. Finance Analitica (The Ledger)
-The financial heartbeat of the platform. Instead of relying solely on manual data entry, this module acts as a passive aggregator, listening to activities across the ecosystem to generate real-time financial insights.
-* **Core Functions:** Tracking operating income, expenditure, and calculating net profit for Florida LLCs or business entities.
-* **Visualization:** Rendered dashboards using Chart.js to map cash flow trends over time.
-* **Automation:** Automatically updates balances when services are booked or inventory supplies are purchased.
+### A. Marketplace Discovery (The Docking Bay)
+The buyer-facing experience for exploring catalog items and finding products that fit the mission.
+* **Core Functions:** Browse listings, inspect product details, and move from discovery to checkout.
+* **User Focus:** Buyers seeking a clear, fast, and trustworthy buying experience.
 
-### B. Service Management (The Calendar)
-The operational scheduling engine designed to manage logistical booking and provider assignments.
-* **Core Functions:** Interactive calendars for blocking dates and managing recurring operations (e.g., mapping out property cleaning schedules or booking multi-day maintenance jobs).
-* **Provider Logistics:** Assigning specific personnel to tasks and processing client reservations.
-* **Cross-Talk Integration:** Upon completion or booking of a service, the module triggers a payment event that is automatically logged into the Finance module's ledger.
+### B. Seller Shop Operations (The Hangar)
+The seller-facing experience for operating storefronts and managing product availability.
+* **Core Functions:** Create shops, publish listings, manage pricing, and monitor stock levels.
+* **User Focus:** Sellers who need operational clarity and control over their offerings.
 
-### C. Product Manejo (Inventory Management)
-The asset tracking system for managing physical goods, raw materials, and product sales.
-* **Core Functions:** Monitoring stock levels in real-time, calculating the cost of goods sold, and managing supplier orders (e.g., tracking the depletion of bulk materials like pallets of clay or cleaning supplies).
-* **Cross-Talk Integration:** Deducts from inventory counts dynamically when jobs in the Service module are executed. Purchasing new materials automatically logs an expense in the Finance module.
+### C. Orders, Payments & Fulfillment (The Command Deck)
+The shared marketplace transaction layer responsible for turning browsing into completed commerce.
+* **Core Functions:** Create orders, process payment events, and align inventory and sales activity.
+* **Cross-Talk Integration:** Marketplace actions update inventory and transaction records so buyers, sellers, and operations stay synchronized.
 
 ## 3. System Architecture
-The platform relies on a **Node.js (Express)** backend with an **EJS** templating frontend, structuring logic using the Model-View-Controller (MVC) pattern. Data persistence is managed via a relational database (PostgreSQL/MySQL) to facilitate module cross-talk.
+The platform relies on a **Node.js (Express)** backend with an **EJS** templating frontend, structuring logic with the Model-View-Controller (MVC) pattern. Data persistence is managed through a relational database to support commerce across buyers, sellers, listings, orders, and payments.
 
 ```text
-naut_platform/
+nautware/
 ├── core/                       # The Shared Hub
 │   ├── database/               # Relational DB Config
 │   ├── routes/                 # Global routing (Auth, Dashboard)
 │   └── views/                  # Shared UI templates
-├── modules/                    # The Application Spokes
-│   ├── finance/                # Controllers, Models, Routes
-│   ├── services/               # Controllers, Models, Routes
-│   └── inventory/              # Controllers, Models, Routes
-├── public/                     # Static Assets (CSS, Logos)
-└── server.js                   # Application Entry Point
+├── modules/                    # Marketplace application modules
+│   └── inventory/              # Catalog, stock, and marketplace item logic
+├── public/                     # Static assets (CSS, logos, imagery)
+└── server.js                   # Application entry point
 ```
 
 ## 4. Phased Implementation Plan
-* **Phase 1: Foundation & Data Modeling.** Establish the Node.js environment and design the relational database schema outlining exactly how a *Transaction*, *Service Booking*, and *Inventory Item* interact.
-* **Phase 2: Core Platform Routing.** Build the core hub, establishing the unified dashboard view and basic navigation structure.
-* **Phase 3: Module Development.** Construct the isolated logic for Finance, Services, and Inventory, ensuring the models accurately query the shared database.
+* **Phase 1: Foundation & Data Modeling.** Establish the Node.js environment and define the relational schema for shops, product listings, buyers, orders, and payments.
+* **Phase 2: Core Marketplace Routing.** Build the shared command center, including authentication, navigation, and marketplace entry points.
+* **Phase 3: Commerce Module Development.** Deliver discovery, seller shop management, inventory alignment, and order/payment workflows.

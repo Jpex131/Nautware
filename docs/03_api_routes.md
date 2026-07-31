@@ -1,25 +1,31 @@
 # API Routes & Web Endpoints
 
-*This document lists the URLs and routing structure for the Naut platform.*
+*This document lists the URLs and routing structure for the Nautware marketplace platform.*
 
 ## Core Routes
-- `GET /` : Main dashboard overview (Hub)
-- `GET /login` : Authentication
+- `GET /` : Marketplace landing and command overview
+- `GET /login` : Authentication gateway
 - `POST /auth/login` : Login handler
 
-## Modules
+## Marketplace Modules
 
-### Finance Analitica
-- `GET /finance` : Finance dashboard
-- `GET /finance/ledger` : Full transaction list
-- `POST /finance/transaction` : Manually log transaction
+### Buyer Experience
+- `GET /marketplace` : Browse available listings
+- `GET /listings` : List all active products
+- `GET /listings/:id` : View a specific listing
 
-### Service Management
-- `GET /services` : Calendar view
-- `POST /services/book` : Create new booking
-- `PUT /services/:id/status` : Update booking status
+### Seller Experience
+- `GET /shops` : View seller storefronts
+- `POST /shops` : Create a new shop
+- `GET /shops/:id` : View a seller shop profile
+- `POST /listings` : Publish a new product listing
 
-### Inventory Management
-- `GET /inventory` : Asset tracking dashboard
-- `POST /inventory/order` : Log new supply order
-- `PUT /inventory/:id/deduct` : Deduct materials used
+### Orders & Payments
+- `GET /orders` : View customer or seller orders
+- `POST /orders` : Create a new order
+- `GET /orders/:id` : Review a specific order
+- `POST /payments/checkout` : Process checkout and payment initiation
+
+### Catalog & Inventory
+- `GET /inventory` : Review stock availability for listings
+- `PUT /inventory/:id` : Update listing stock or availability

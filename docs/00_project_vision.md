@@ -1,15 +1,15 @@
-# NAUT ERP Platform - Project Vision
+# NAUT Marketplace Vision
 
 ## Executive Summary
-The Naut platform is designed as a unified, web-based Enterprise Resource Planning (ERP) suite. Built with a Modular Monolith architecture, the application integrates specialized business management tools under a cohesive aerospace and terraforming-inspired interface. 
+Nautware is designed as a multi-sided marketplace platform that connects buyers and sellers within a single Dark Aerospace command deck. The system brings together storefronts, product listings, orders, payments, and inventory visibility so commerce can feel coordinated, immersive, and operationally clear.
 
 ## Aesthetic & Design Language
 The UI/UX is built on a "Dark Aerospace" theme characterized by:
-- Deep Navy and Void backgrounds (`#050a14`, `#0a1628`).
-- Electric Blue and Lime Green high-contrast accents.
+- Deep navy and void backgrounds (`#050a14`, `#0a1628`).
+- Electric blue and lime green high-contrast accents.
 - Utilitarian typography (monospace coordinate labels, clean sans-serif data displays).
 - Subdued glass-morphism overlays for panels and modals.
-- Interactive, dynamic components like audio visualizers and grid viewports.
+- Interactive, dynamic components such as audio visualizers and grid-based mission views.
 
 ## Core Goal
-To seamlessly automate business operations—like finance tracking, service booking, and inventory management—while maintaining an elite, cinematic user experience. The initial launch focuses on establishing three core pillars that operate independently but share a centralized database.
+To orchestrate marketplace commerce with precision—enabling buyers to discover products, sellers to manage shops and listings, and the platform to keep orders, payments, and inventory aligned—while preserving an elite, cinematic user experience.
