@@ -73,6 +73,80 @@ async function initDB() {
         `);
         console.log('✅ products table initialized');
 
+        // Create Orders table
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS orders (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                order_number VARCHAR(50) UNIQUE NOT NULL,
+                customer_id BIGINT UNSIGNED NOT NULL,
+                seller_id BIGINT UNSIGNED NOT NULL,
+                status ENUM('PENDING', 'PAYMENT_HELD', 'PAID', 'SHIPPED', 'DELIVERED', 'COMPLETED', 'CANCELLED') DEFAULT 'PENDING',
+                total_amount DECIMAL(12, 2) NOT NULL,
+                delivery_method ENUM('STANDARD_MAIL', 'DRONE_DROP', 'LOCAL_PICKUP') DEFAULT 'STANDARD_MAIL',
+                special_instructions TEXT,
+                shipping_address_id BIGINT UNSIGNED NULL,
+                billing_address_id BIGINT UNSIGNED NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                completed_at TIMESTAMP NULL,
+                FOREIGN KEY (customer_id) REFERENCES users(id) ON DELETE RESTRICT,
+                FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE RESTRICT,
+                INDEX idx_customer_id (customer_id),
+                INDEX idx_seller_id (seller_id),
+                INDEX idx_status (status),
+                UNIQUE KEY unique_order_number (order_number)
+            )
+        `);
+        console.log('✅ orders table initialized');
+
+        // Create Order Items table
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS order_items (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                order_id BIGINT UNSIGNED NOT NULL,
+                product_id BIGINT UNSIGNED NULL,
+                service_id BIGINT UNSIGNED NULL,
+                quantity INT DEFAULT 1,
+                unit_price DECIMAL(10, 2) NOT NULL,
+                line_total DECIMAL(12, 2) NOT NULL,
+                service_date DATETIME NULL,
+                service_time_slot VARCHAR(50) NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+                FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL,
+                INDEX idx_order_id (order_id)
+            )
+        `);
+        console.log('✅ order_items table initialized');
+
+        // Create Payments table
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS payments (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                order_id BIGINT UNSIGNED UNIQUE NOT NULL,
+                customer_id BIGINT UNSIGNED NOT NULL,
+                seller_id BIGINT UNSIGNED NOT NULL,
+                amount DECIMAL(12, 2) NOT NULL,
+                payment_gateway_id BIGINT UNSIGNED NOT NULL,
+                status ENUM('PENDING', 'HELD', 'RELEASED', 'REFUNDED', 'DISPUTED', 'FAILED') DEFAULT 'PENDING',
+                transaction_id VARCHAR(255),
+                payment_method_details JSON,
+                holds_until TIMESTAMP NULL,
+                dispute_deadline TIMESTAMP NULL,
+                released_at TIMESTAMP NULL,
+                refunded_at TIMESTAMP NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE RESTRICT,
+                FOREIGN KEY (customer_id) REFERENCES users(id) ON DELETE RESTRICT,
+                FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE RESTRICT,
+                INDEX idx_status (status),
+                INDEX idx_customer_id (customer_id),
+                INDEX idx_seller_id (seller_id)
+            )
+        `);
+        console.log('✅ payments table initialized');
+
         connection.release();
         console.log('Database initialization complete!');
         process.exit(0);
