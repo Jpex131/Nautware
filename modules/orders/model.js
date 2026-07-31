@@ -7,12 +7,23 @@ class OrderModel {
         try {
             await connection.beginTransaction();
 
+            const [shopRows] = await connection.execute(
+                'SELECT user_id FROM shops WHERE id = ?',
+                [shopId]
+            );
+
+            if (shopRows.length === 0) {
+                throw new Error('Shop not found');
+            }
+
+            const sellerId = shopRows[0].user_id;
+
             const [orderResult] = await connection.execute(
                 'INSERT INTO orders (order_number, customer_id, seller_id, total_amount, status) VALUES (?, ?, ?, ?, ?)',
                 [
                     `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
                     buyerId,
-                    shopId,
+                    sellerId,
                     totalAmount,
                     'PENDING'
                 ]
