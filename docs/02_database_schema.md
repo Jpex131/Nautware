@@ -1,6 +1,6 @@
 # Database Schema - Nautware Multi-Sided Marketplace
 
-*Complete relational database design for Nautware ERP platform with marketplace, escrow payments, and financial tracking.*
+*Complete relational database design for the Nautware marketplace platform, including escrow payments and financial tracking.*
 
 ---
 

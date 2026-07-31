@@ -118,7 +118,7 @@ app.get('/health', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`==================================================`);
-    console.log(` NAUTWARE ERP Server is orbiting on port ${PORT}`);
+    console.log(` NAUTWARE Marketplace Server is orbiting on port ${PORT}`);
     console.log(` Local URL: http://localhost:${PORT}`);
     console.log(`==================================================`);
 });

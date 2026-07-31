@@ -1,6 +1,6 @@
 # Future Modules & Expansions
 
-*This document captures ideas for future tools and features to be integrated into the Naut ERP platform once the core modules are established.*
+*This document captures ideas for future tools and features to be integrated into the Nautware marketplace platform once the core modules are established.*
 
 ## Ideas
 

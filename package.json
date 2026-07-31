@@ -1,7 +1,7 @@
 {
   "name": "nautware",
   "version": "1.0.0",
-  "description": "<div align=\"center\">   <img src=\"assets/images/naut_logo.png\" alt=\"Nautware Logo\" height=\"80\">   <br/>   <h1>Nautware ERP Platform</h1>   <p><strong>A unified, modular Enterprise Resource Planning (ERP) suite.</strong></p> </div>",
+  "description": "<div align=\"center\">   <img src=\"assets/images/naut_logo.png\" alt=\"Nautware Logo\" height=\"80\">   <br/>   <h1>Nautware Marketplace Platform</h1>   <p><strong>A modular marketplace platform for buyers, sellers, and operators.</strong></p> </div>",
   "main": "server.js",
   "directories": {
     "doc": "docs"
