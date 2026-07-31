@@ -109,6 +109,9 @@ app.get('/services', requireAuth, (req, res) => {
 const inventoryRouter = require('./modules/inventory/routes');
 app.use('/inventory', inventoryRouter);
 
+const orderRoutes = require('./modules/orders/routes');
+app.use('/orders', orderRoutes);
+
 app.get('/health', (req, res) => {
     res.json({ status: 'UP', uptime: process.uptime() });
 });
