@@ -19,7 +19,7 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'nautware-dark-aerospace-secret-key-13579',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
+    cookie: { secure: process.env.NODE_ENV === 'production', maxAge: 24 * 60 * 60 * 1000 }
 }));
 
 app.use('/css', express.static(path.join(__dirname, 'css')));
