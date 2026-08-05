@@ -18,7 +18,10 @@ router.get('/', InventoryController.renderInventoryDashboard);
 
 // Shop routes
 router.post('/shop/create', InventoryController.createShop);
-
+router.get('/shop/:slug', InventoryController.renderShopProfile);
+router.post('/shop/:shopId/posts/create', InventoryController.createShopPost);
+router.post('/shop/:shopId/posts/:postId/delete', InventoryController.deleteShopPost);
+router.post('/shop/:shopId/update-profile', InventoryController.updateShopProfile);
 // Product routes
 router.post('/product/create', InventoryController.createProduct);
 router.post('/product/:id/update', InventoryController.updateProduct);

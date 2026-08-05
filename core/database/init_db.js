@@ -46,6 +46,21 @@ async function initDB() {
         `);
         console.log('✅ shops table initialized');
 
+        // Create Shop Posts table
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS shop_posts (
+                id SERIAL PRIMARY KEY,
+                shop_id BIGINT UNSIGNED NOT NULL,
+                content TEXT NOT NULL,
+                image_url VARCHAR(500) NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE,
+                INDEX idx_shop_id (shop_id)
+            )
+        `);
+        console.log('✅ shop_posts table initialized');
+
         // Create Products table
         await connection.query(`
             CREATE TABLE IF NOT EXISTS products (

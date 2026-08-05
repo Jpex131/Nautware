@@ -19,6 +19,54 @@ class InventoryModel {
         return rows.length > 0 ? rows[0] : null;
     }
 
+    static async getShopBySlug(slug) {
+        const [rows] = await pool.execute(
+            'SELECT * FROM shops WHERE shop_slug = ?',
+            [slug]
+        );
+        return rows.length > 0 ? rows[0] : null;
+    }
+
+    static async getProductsByShopId(shopId) {
+        const [rows] = await pool.execute(
+            'SELECT * FROM products WHERE shop_id = ? AND is_active = TRUE ORDER BY created_at DESC',
+            [shopId]
+        );
+        return rows;
+    }
+
+    static async getPostsByShopId(shopId) {
+        const [rows] = await pool.execute(
+            'SELECT * FROM shop_posts WHERE shop_id = ? ORDER BY created_at DESC',
+            [shopId]
+        );
+        return rows;
+    }
+
+    static async createPost(shopId, content, imageUrl) {
+        const [result] = await pool.execute(
+            'INSERT INTO shop_posts (shop_id, content, image_url) VALUES (?, ?, ?)',
+            [shopId, content, imageUrl]
+        );
+        return result.insertId;
+    }
+
+    static async deletePost(postId, shopId) {
+        const [result] = await pool.execute(
+            'DELETE FROM shop_posts WHERE id = ? AND shop_id = ?',
+            [postId, shopId]
+        );
+        return result.affectedRows > 0;
+    }
+
+    static async updateShopProfile(shopId, { shopDescription, shopImageUrl, shopBannerUrl }) {
+        const [result] = await pool.execute(
+            'UPDATE shops SET shop_description = ?, shop_image_url = ?, shop_banner_url = ? WHERE id = ?',
+            [shopDescription, shopImageUrl, shopBannerUrl, shopId]
+        );
+        return result.affectedRows > 0;
+    }
+
     // --- SELLER PRODUCT MANAGEMENT ---
 
     static async createProduct(shopId, data) {

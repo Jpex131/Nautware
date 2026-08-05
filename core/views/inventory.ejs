@@ -358,7 +358,7 @@
                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
                     <% if (marketplaceShops && marketplaceShops.length > 0) { %>
                         <% marketplaceShops.forEach(mShop => { %>
-                            <div class="card-erp" style="padding: 24px; display: flex; flex-direction: column; height: 200px; background: rgba(30,30,45,0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; align-items: center; text-align: center;">
+                            <div class="card-erp" onclick="window.location.href='/inventory/shop/<%= mShop.shop_slug %>'" style="cursor: pointer; padding: 24px; display: flex; flex-direction: column; height: 200px; background: rgba(30,30,45,0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; align-items: center; text-align: center;">
                                 <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-500); margin-bottom: 12px;">
                                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                                 </div>
