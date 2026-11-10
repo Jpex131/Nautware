@@ -26,6 +26,8 @@ router.post('/shop/:shopId/update-profile', InventoryController.updateShopProfil
 router.post('/product/create', InventoryController.createProduct);
 router.post('/product/:id/update', InventoryController.updateProduct);
 router.post('/product/:id/delete', InventoryController.deleteProduct);
+router.get('/product/:id/reviews', InventoryController.listProductReviews);
+router.post('/product/:id/reviews', InventoryController.createProductReview);
 
 // API/Discovery routes
 router.get('/api/discover', InventoryController.discoverProducts);

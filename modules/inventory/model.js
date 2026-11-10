@@ -1,6 +1,18 @@
 const pool = require('../../core/database/db');
 
 class InventoryModel {
+    // Resolve category labels to IDs while callers retain the text label for existing views and filters.
+    static async getOrCreateCategoryId(category) {
+        const name = typeof category === 'string' ? category.trim() : '';
+        if (!name) return null;
+
+        const [result] = await pool.execute(
+            'INSERT INTO categories (name) VALUES (?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)',
+            [name]
+        );
+        return result.insertId;
+    }
+
     // --- SHOP MANAGEMENT ---
     
     static async createShop(userId, shopName, shopSlug, shopDescription) {
@@ -71,18 +83,22 @@ class InventoryModel {
 
     static async createProduct(shopId, data) {
         const { name, slug, description, category, price, stock_level, image_url } = data;
+        const categoryName = typeof category === 'string' ? category.trim() : '';
+        const categoryId = await this.getOrCreateCategoryId(categoryName);
         const imagesJson = image_url ? JSON.stringify([image_url]) : JSON.stringify([]);
         const [result] = await pool.execute(
-            'INSERT INTO products (shop_id, name, slug, description, category, price, stock_level, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [shopId, name, slug, description, category, price, stock_level || 0, imagesJson]
+            'INSERT INTO products (shop_id, category_id, name, slug, description, category, price, stock_level, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [shopId, categoryId, name, slug, description, categoryName || null, price, stock_level || 0, imagesJson]
         );
         return result.insertId;
     }
 
     static async updateProduct(productId, shopId, data) {
         const { name, description, category, price, image_url, stock_level } = data;
-        let sql = 'UPDATE products SET name = ?, description = ?, category = ?, price = ?, stock_level = ?';
-        let params = [name, description, category, price, stock_level || 0];
+        const categoryName = typeof category === 'string' ? category.trim() : '';
+        const categoryId = await this.getOrCreateCategoryId(categoryName);
+        let sql = 'UPDATE products SET name = ?, description = ?, category_id = ?, category = ?, price = ?, stock_level = ?';
+        let params = [name, description, categoryId, categoryName || null, price, stock_level || 0];
 
         if (image_url !== undefined) {
             sql += ', images = ?';
@@ -185,6 +201,107 @@ class InventoryModel {
 
         const [rows] = await pool.execute(sql, params);
         return rows;
+    }
+
+    static async getProductReviews(productId, buyerId) {
+        const [productRows] = await pool.execute(
+            `SELECT p.id, p.average_rating, p.review_count, s.user_id AS seller_id,
+                    EXISTS (
+                        SELECT 1 FROM orders o
+                        JOIN order_items oi ON oi.order_id = o.id
+                        WHERE o.customer_id = ? AND o.status = 'COMPLETED' AND oi.product_id = p.id
+                    ) AS has_completed_purchase,
+                    EXISTS (
+                        SELECT 1 FROM reviews r
+                        WHERE r.product_id = p.id AND r.buyer_id = ?
+                    ) AS has_reviewed
+             FROM products p
+             JOIN shops s ON s.id = p.shop_id
+             WHERE p.id = ?`,
+            [buyerId, buyerId, productId]
+        );
+
+        if (productRows.length === 0) return null;
+
+        const [reviews] = await pool.execute(
+            `SELECT r.id, r.rating, r.comment, r.created_at,
+                    COALESCE(NULLIF(TRIM(CONCAT(u.first_name, ' ', u.last_name)), ''), u.email) AS reviewer_name
+             FROM reviews r
+             JOIN users u ON u.id = r.buyer_id
+             WHERE r.product_id = ?
+             ORDER BY r.created_at DESC`,
+            [productId]
+        );
+
+        const product = productRows[0];
+        const isSeller = String(product.seller_id) === String(buyerId);
+        const hasReviewed = Boolean(product.has_reviewed);
+        return {
+            reviews,
+            averageRating: Number(product.average_rating),
+            reviewCount: product.review_count,
+            canReview: !isSeller && Boolean(product.has_completed_purchase) && !hasReviewed,
+            hasReviewed,
+            isSeller
+        };
+    }
+
+    static async createProductReview(productId, buyerId, rating, comment) {
+        const connection = await pool.getConnection();
+
+        try {
+            await connection.beginTransaction();
+
+            const [productRows] = await connection.execute(
+                'SELECT p.id, s.user_id AS seller_id FROM products p JOIN shops s ON s.id = p.shop_id WHERE p.id = ?',
+                [productId]
+            );
+            if (productRows.length === 0) {
+                const error = new Error('Product not found');
+                error.code = 'PRODUCT_NOT_FOUND';
+                throw error;
+            }
+            if (String(productRows[0].seller_id) === String(buyerId)) {
+                const error = new Error('Sellers cannot review their own products');
+                error.code = 'OWN_PRODUCT';
+                throw error;
+            }
+
+            const [purchaseRows] = await connection.execute(
+                `SELECT oi.id
+                 FROM order_items oi
+                 JOIN orders o ON o.id = oi.order_id
+                 WHERE o.customer_id = ? AND o.status = 'COMPLETED' AND oi.product_id = ?
+                 LIMIT 1`,
+                [buyerId, productId]
+            );
+            if (purchaseRows.length === 0) {
+                const error = new Error('A completed purchase is required to review this product');
+                error.code = 'PURCHASE_REQUIRED';
+                throw error;
+            }
+
+            const [result] = await connection.execute(
+                'INSERT INTO reviews (product_id, buyer_id, rating, comment) VALUES (?, ?, ?, ?)',
+                [productId, buyerId, rating, comment || null]
+            );
+
+            await connection.execute(
+                `UPDATE products
+                 SET review_count = (SELECT COUNT(*) FROM reviews WHERE product_id = ?),
+                     average_rating = (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE product_id = ?)
+                 WHERE id = ?`,
+                [productId, productId, productId]
+            );
+
+            await connection.commit();
+            return result.insertId;
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
+        }
     }
 }
 

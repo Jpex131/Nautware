@@ -315,6 +315,7 @@
                                 }
                             %>
                             <div class="card-erp mkt-product-card" 
+                                   data-product-id="<%= product.id %>"
                                  data-category="<%= product.category %>" 
                                  data-name="<%= product.name %>"
                                  data-price="<%= product.price %>"
@@ -402,6 +403,28 @@
                 <h4 style="color: var(--text-primary); margin-bottom: 8px; font-size: 1rem;">Description</h4>
                 <p id="modal-desc" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;"></p>
             </div>
+
+            <section style="margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px;">
+                    <h3 style="margin: 0; color: var(--text-primary); font-size: 1.1rem;">Reviews</h3>
+                    <span id="review-summary" style="color: var(--text-muted); font-size: 0.9rem;">Loading...</span>
+                </div>
+                <p id="review-status" role="status" style="color: var(--text-muted); font-size: 0.9rem; margin: 12px 0;"></p>
+                <div id="review-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
+                <form id="review-form" style="display: none; margin-top: 16px; flex-direction: column; gap: 10px;">
+                    <label for="review-rating" style="color: var(--text-secondary); font-size: 0.9rem;">Your rating</label>
+                    <select id="review-rating" name="rating" required style="padding: 10px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px;">
+                        <option value="5">5 - Excellent</option>
+                        <option value="4">4 - Good</option>
+                        <option value="3">3 - Average</option>
+                        <option value="2">2 - Poor</option>
+                        <option value="1">1 - Very poor</option>
+                    </select>
+                    <label for="review-comment" style="color: var(--text-secondary); font-size: 0.9rem;">Comment</label>
+                    <textarea id="review-comment" name="comment" rows="3" maxlength="5000" placeholder="Share your experience" style="padding: 10px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; resize: vertical;"></textarea>
+                    <button type="submit" style="padding: 10px 14px; align-self: flex-start; background: var(--accent-500); color: white; border: 0; border-radius: 4px; font-weight: 600; cursor: pointer;">Submit review</button>
+                </form>
+            </section>
             
             <div style="display: flex; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
                 <button onclick="alert('Added to Cart!')" style="flex: 1; padding: 14px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">Add to Cart</button>
@@ -412,13 +435,96 @@
 </div>
 
 <script>
+    let activeReviewProductId = null;
+
+    async function loadProductReviews(productId) {
+        const status = document.getElementById('review-status');
+        const summary = document.getElementById('review-summary');
+        const reviewList = document.getElementById('review-list');
+        const reviewForm = document.getElementById('review-form');
+        reviewForm.style.display = 'none';
+        reviewList.replaceChildren();
+        status.textContent = 'Loading reviews...';
+
+        try {
+            const response = await fetch(`/inventory/product/${productId}/reviews`);
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Could not load reviews');
+
+            summary.textContent = `${Number(data.averageRating).toFixed(1)} / 5 (${data.reviewCount} reviews)`;
+            if (data.reviews.length === 0) {
+                const emptyState = document.createElement('p');
+                emptyState.textContent = 'No reviews yet.';
+                emptyState.style.color = 'var(--text-muted)';
+                reviewList.append(emptyState);
+            } else {
+                data.reviews.forEach(review => {
+                    const item = document.createElement('article');
+                    item.style.cssText = 'padding: 12px; background: rgba(255,255,255,0.04); border-radius: 4px;';
+                    const heading = document.createElement('strong');
+                    heading.textContent = `${review.reviewer_name} - ${review.rating}/5`;
+                    const date = document.createElement('small');
+                    date.textContent = ` · ${new Date(review.created_at).toLocaleDateString()}`;
+                    date.style.color = 'var(--text-muted)';
+                    const comment = document.createElement('p');
+                    comment.textContent = review.comment || 'No written comment.';
+                    comment.style.cssText = 'margin: 8px 0 0; color: var(--text-secondary); white-space: pre-wrap;';
+                    item.append(heading, date, comment);
+                    reviewList.append(item);
+                });
+            }
+
+            reviewForm.style.display = data.canReview ? 'flex' : 'none';
+            if (data.canReview) {
+                status.textContent = 'Your completed purchase makes you eligible to review this product.';
+            } else if (data.isSeller) {
+                status.textContent = 'You cannot review your own product.';
+            } else if (data.hasReviewed) {
+                status.textContent = 'You have already reviewed this product.';
+            } else {
+                status.textContent = 'A completed purchase is required to leave a review.';
+            }
+        } catch (error) {
+            summary.textContent = '';
+            status.textContent = error.message;
+        }
+    }
+
+    document.getElementById('review-form').addEventListener('submit', async event => {
+        event.preventDefault();
+        if (!activeReviewProductId) return;
+
+        const status = document.getElementById('review-status');
+        const formData = new FormData(event.currentTarget);
+        try {
+            const response = await fetch(`/inventory/product/${activeReviewProductId}/reviews`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    rating: formData.get('rating'),
+                    comment: formData.get('comment')
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Could not submit review');
+
+            event.currentTarget.reset();
+            await loadProductReviews(activeReviewProductId);
+            status.textContent = 'Your review was submitted.';
+        } catch (error) {
+            status.textContent = error.message;
+        }
+    });
+
     function openModalFromCard(el) {
+        activeReviewProductId = el.dataset.productId;
         document.getElementById('modal-name').innerText = el.dataset.name;
         document.getElementById('modal-price').innerText = '$' + el.dataset.price;
         document.getElementById('modal-desc').innerText = el.dataset.desc;
         document.getElementById('modal-img').src = el.dataset.img;
         document.getElementById('modal-shop').innerText = el.dataset.shop;
         document.getElementById('product-modal-overlay').style.display = 'flex';
+        loadProductReviews(activeReviewProductId);
     }
 </script>
 

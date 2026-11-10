@@ -61,11 +61,22 @@ async function initDB() {
         `);
         console.log('✅ shop_posts table initialized');
 
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS categories (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL UNIQUE,
+                description TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('✅ categories table initialized');
+
         // Create Products table
         await connection.query(`
             CREATE TABLE IF NOT EXISTS products (
                 id SERIAL PRIMARY KEY,
                 shop_id BIGINT UNSIGNED NOT NULL,
+                category_id BIGINT UNSIGNED NULL,
                 name VARCHAR(255) NOT NULL,
                 slug VARCHAR(255),
                 description TEXT NOT NULL,
@@ -82,11 +93,72 @@ async function initDB() {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE,
+                FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
                 INDEX idx_shop_id (shop_id),
-                INDEX idx_category (category)
+                INDEX idx_category (category),
+                INDEX idx_category_id (category_id)
             )
         `);
+
+        const [categoryIdColumn] = await connection.query("SHOW COLUMNS FROM products LIKE 'category_id'");
+        if (categoryIdColumn.length === 0) {
+            await connection.query('ALTER TABLE products ADD COLUMN category_id BIGINT UNSIGNED NULL AFTER shop_id');
+        }
+
+        // Backfill normalized categories from the legacy text field before linking products to them.
+        await connection.query(`
+            INSERT INTO categories (name)
+            SELECT DISTINCT TRIM(category)
+            FROM products
+            WHERE category IS NOT NULL AND TRIM(category) <> ''
+            ON DUPLICATE KEY UPDATE name = VALUES(name)
+        `);
+        await connection.query(`
+            UPDATE products p
+            JOIN categories c ON c.name = TRIM(p.category)
+            SET p.category_id = c.id
+            WHERE p.category_id IS NULL AND p.category IS NOT NULL AND TRIM(p.category) <> ''
+        `);
+
+        const [categoryIndex] = await connection.query("SHOW INDEX FROM products WHERE Key_name = 'idx_category_id'");
+        if (categoryIndex.length === 0) {
+            await connection.query('ALTER TABLE products ADD INDEX idx_category_id (category_id)');
+        }
+
+        const [categoryForeignKey] = await connection.query(`
+            SELECT CONSTRAINT_NAME
+            FROM information_schema.KEY_COLUMN_USAGE
+            WHERE TABLE_SCHEMA = DATABASE()
+              AND TABLE_NAME = 'products'
+              AND COLUMN_NAME = 'category_id'
+              AND REFERENCED_TABLE_NAME = 'categories'
+        `);
+        if (categoryForeignKey.length === 0) {
+            await connection.query(`
+                ALTER TABLE products
+                ADD CONSTRAINT fk_products_category
+                FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
+            `);
+        }
         console.log('✅ products table initialized');
+
+        // Keep one product-level review per buyer and constrain ratings to the expected range.
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS reviews (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                product_id BIGINT UNSIGNED NOT NULL,
+                buyer_id BIGINT UNSIGNED NOT NULL,
+                rating TINYINT UNSIGNED NOT NULL,
+                comment TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT chk_reviews_rating CHECK (rating BETWEEN 1 AND 5),
+                CONSTRAINT unique_product_review_per_buyer UNIQUE (product_id, buyer_id),
+                FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+                FOREIGN KEY (buyer_id) REFERENCES users(id) ON DELETE CASCADE,
+                INDEX idx_reviews_buyer_id (buyer_id)
+            )
+        `);
+        console.log('✅ reviews table initialized');
 
         // Create Orders table
         await connection.query(`

@@ -208,6 +208,58 @@ const InventoryController = {
             console.error('Error searching products:', error);
             res.status(500).send('Error searching products');
         }
+    },
+
+    listProductReviews: async (req, res) => {
+        const productId = Number(req.params.id);
+        if (!Number.isSafeInteger(productId) || productId < 1) {
+            return res.status(400).json({ error: 'Invalid product ID' });
+        }
+
+        try {
+            const result = await InventoryModel.getProductReviews(productId, req.session.userId);
+            if (!result) return res.status(404).json({ error: 'Product not found' });
+            res.json(result);
+        } catch (error) {
+            console.error('Error fetching product reviews:', error);
+            res.status(500).json({ error: 'Error fetching reviews' });
+        }
+    },
+
+    createProductReview: async (req, res) => {
+        const productId = Number(req.params.id);
+        const rating = Number(req.body.rating);
+        const comment = typeof req.body.comment === 'string' ? req.body.comment.trim() : '';
+
+        if (!Number.isSafeInteger(productId) || productId < 1) {
+            return res.status(400).json({ error: 'Invalid product ID' });
+        }
+        if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+            return res.status(400).json({ error: 'Rating must be an integer from 1 to 5' });
+        }
+        if (comment.length > 5000) {
+            return res.status(400).json({ error: 'Review must be 5000 characters or fewer' });
+        }
+
+        try {
+            const reviewId = await InventoryModel.createProductReview(
+                productId,
+                req.session.userId,
+                rating,
+                comment
+            );
+            res.status(201).json({ success: true, reviewId });
+        } catch (error) {
+            if (error.code === 'PRODUCT_NOT_FOUND') return res.status(404).json({ error: error.message });
+            if (error.code === 'PURCHASE_REQUIRED' || error.code === 'OWN_PRODUCT') {
+                return res.status(403).json({ error: error.message });
+            }
+            if (error.code === 'ER_DUP_ENTRY') {
+                return res.status(409).json({ error: 'You have already reviewed this product' });
+            }
+            console.error('Error creating product review:', error);
+            res.status(500).json({ error: 'Error creating review' });
+        }
     }
 };
 
