@@ -206,6 +206,22 @@ async function initDB() {
         `);
         console.log('✅ order_items table initialized');
 
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS payment_gateways (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                provider_key VARCHAR(100) NOT NULL UNIQUE,
+                name VARCHAR(100) NOT NULL,
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        await connection.query(`
+            INSERT INTO payment_gateways (provider_key, name, is_active)
+            VALUES ('lnbits_lightning', 'Bitcoin Lightning (LNbits)', TRUE)
+            ON DUPLICATE KEY UPDATE name = VALUES(name), is_active = VALUES(is_active)
+        `);
+        console.log('✅ payment_gateways table initialized');
+
         // Create Payments table
         await connection.query(`
             CREATE TABLE IF NOT EXISTS payments (
@@ -217,6 +233,9 @@ async function initDB() {
                 payment_gateway_id BIGINT UNSIGNED NOT NULL,
                 status ENUM('PENDING', 'HELD', 'RELEASED', 'REFUNDED', 'DISPUTED', 'FAILED') DEFAULT 'PENDING',
                 transaction_id VARCHAR(255),
+                payment_request TEXT NULL,
+                checking_id VARCHAR(255) NULL,
+                invoice_expires_at DATETIME NULL,
                 payment_method_details JSON,
                 holds_until TIMESTAMP NULL,
                 dispute_deadline TIMESTAMP NULL,
@@ -232,6 +251,34 @@ async function initDB() {
                 INDEX idx_seller_id (seller_id)
             )
         `);
+
+        const [paymentColumns] = await connection.query('SHOW COLUMNS FROM payments');
+        const paymentColumnNames = new Set(paymentColumns.map(column => column.Field));
+        if (!paymentColumnNames.has('payment_request')) {
+            await connection.query('ALTER TABLE payments ADD COLUMN payment_request TEXT NULL AFTER transaction_id');
+        }
+        if (!paymentColumnNames.has('checking_id')) {
+            await connection.query('ALTER TABLE payments ADD COLUMN checking_id VARCHAR(255) NULL AFTER payment_request');
+        }
+        if (!paymentColumnNames.has('invoice_expires_at')) {
+            await connection.query('ALTER TABLE payments ADD COLUMN invoice_expires_at DATETIME NULL AFTER checking_id');
+        }
+
+        const [paymentGatewayForeignKey] = await connection.query(`
+            SELECT CONSTRAINT_NAME
+            FROM information_schema.KEY_COLUMN_USAGE
+            WHERE TABLE_SCHEMA = DATABASE()
+              AND TABLE_NAME = 'payments'
+              AND COLUMN_NAME = 'payment_gateway_id'
+              AND REFERENCED_TABLE_NAME = 'payment_gateways'
+        `);
+        if (paymentGatewayForeignKey.length === 0) {
+            await connection.query(`
+                ALTER TABLE payments
+                ADD CONSTRAINT fk_payments_gateway
+                FOREIGN KEY (payment_gateway_id) REFERENCES payment_gateways(id)
+            `);
+        }
         console.log('✅ payments table initialized');
 
         connection.release();

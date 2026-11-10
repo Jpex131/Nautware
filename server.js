@@ -112,6 +112,14 @@ app.use('/inventory', inventoryRouter);
 const orderRoutes = require('./modules/orders/routes');
 app.use('/orders', orderRoutes);
 
+const OrderController = require('./modules/orders/controller');
+const checkoutCleanupTimer = setInterval(() => {
+    OrderController.cleanupPendingCheckouts().catch(error => {
+        console.error('Checkout cleanup failed:', error);
+    });
+}, 60 * 1000);
+checkoutCleanupTimer.unref();
+
 app.get('/health', (req, res) => {
     res.json({ status: 'UP', uptime: process.uptime() });
 });

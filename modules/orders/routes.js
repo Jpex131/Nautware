@@ -13,7 +13,14 @@ const requireAuth = (req, res, next) => {
 // Apply auth middleware to all order routes
 router.use(requireAuth);
 
-router.post('/create', OrderController.createOrder);
+router.get('/cart', OrderController.viewCart);
+router.post('/cart/items/:productId', OrderController.addCartItem);
+router.patch('/cart/items/:productId', OrderController.setCartItemQuantity);
+router.delete('/cart/items/:productId', OrderController.removeCartItem);
+router.post('/checkout', OrderController.createCheckout);
+router.get('/:id/checkout', OrderController.renderCheckout);
+router.get('/:id/status', OrderController.checkCheckoutStatus);
+
 router.get('/my-orders', OrderController.viewMyOrders);
 router.get('/shop-orders', OrderController.viewShopOrders);
 router.post('/:id/status', OrderController.updateOrderStatus);

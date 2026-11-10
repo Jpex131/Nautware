@@ -1,0 +1,78 @@
+<%- include('partials/header') %>
+
+<main class="dashboard-container" style="max-width: 720px; padding-top: 48px;">
+    <section class="card-erp" style="padding: 28px;">
+        <a href="/inventory" style="color: var(--text-secondary); text-decoration: none;">&larr; Back to marketplace</a>
+        <h1 style="margin: 20px 0 8px; color: var(--text-primary);">Lightning checkout</h1>
+        <p style="margin: 0; color: var(--text-muted);">Order <strong><%= orderId %></strong></p>
+
+        <div style="display: grid; grid-template-columns: minmax(160px, 220px) minmax(0, 1fr); gap: 24px; align-items: center; margin-top: 24px;">
+            <img src="<%= qrCodeUrl %>" alt="Lightning invoice QR code" style="width: 100%; aspect-ratio: 1; padding: 10px; background: white; border-radius: 4px;">
+            <div>
+                <p style="color: var(--text-secondary);">Scan this invoice with a wallet connected to the configured test network.</p>
+                <p id="checkout-countdown" data-expires-at="<%= expiresAt ? new Date(expiresAt).toISOString() : '' %>" style="color: var(--text-muted);"></p>
+                <button id="copy-invoice" type="button" style="padding: 10px 14px; background: rgba(255,255,255,0.08); color: var(--text-primary); border: 1px solid rgba(255,255,255,0.16); border-radius: 4px; cursor: pointer;">Copy invoice</button>
+            </div>
+        </div>
+
+        <label for="payment-request" style="display: block; margin-top: 24px; color: var(--text-secondary);">BOLT11 invoice</label>
+        <textarea id="payment-request" readonly rows="4" style="width: 100%; margin-top: 8px; padding: 12px; color: var(--text-primary); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.14); border-radius: 4px; overflow-wrap: anywhere; resize: vertical;"><%= paymentRequest %></textarea>
+        <p id="payment-status" role="status" style="margin-top: 20px; color: var(--text-secondary);">Waiting for payment...</p>
+    </section>
+</main>
+
+<script>
+    const orderId = '<%= orderId %>';
+    const paymentStatus = document.getElementById('payment-status');
+    const invoiceExpiry = new Date(document.getElementById('checkout-countdown').dataset.expiresAt);
+    const invoiceText = document.getElementById('payment-request');
+    let statusTimer;
+
+    document.getElementById('copy-invoice').addEventListener('click', async event => {
+        try {
+            await navigator.clipboard.writeText(invoiceText.value);
+            event.currentTarget.textContent = 'Copied';
+        } catch {
+            invoiceText.select();
+            document.execCommand('copy');
+            event.currentTarget.textContent = 'Copied';
+        }
+    });
+
+    async function pollPayment() {
+        try {
+            const response = await fetch(`/orders/${orderId}/status`);
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Payment check failed');
+            if (data.orderStatus === 'PAID') {
+                paymentStatus.textContent = 'Payment confirmed. Your order is paid.';
+                clearInterval(statusTimer);
+                return;
+            }
+            if (data.orderStatus === 'CANCELLED') {
+                paymentStatus.textContent = 'This invoice expired. Your reserved stock has been released.';
+                clearInterval(statusTimer);
+                return;
+            }
+            paymentStatus.textContent = 'Waiting for payment confirmation...';
+        } catch (error) {
+            paymentStatus.textContent = `${error.message}. Retrying...`;
+        }
+    }
+
+    function updateCountdown() {
+        const seconds = Math.max(0, Math.floor((invoiceExpiry.getTime() - Date.now()) / 1000));
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = String(seconds % 60).padStart(2, '0');
+        document.getElementById('checkout-countdown').textContent = seconds
+            ? `Invoice expires in ${minutes}:${remainingSeconds}`
+            : 'Checking invoice expiry...';
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+    pollPayment();
+    statusTimer = setInterval(pollPayment, 4000);
+</script>
+
+<%- include('partials/footer') %>

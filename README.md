@@ -71,7 +71,10 @@ nautware/
 3. Configure your MySQL credentials in the `.env` file.
 4. Create the database with `node core/database/create_db_first.js`.
 5. Initialize the schema with `node core/database/init_db.js`.
-6. Start the development server with `npm run dev`.
+6. For test checkout, configure `LIGHTNING_NETWORK=regtest`, `LNBITS_URL`, and `LNBITS_INVOICE_KEY` in `.env`. Use an LNbits wallet connected to the same test network; mainnet invoices are rejected.
+7. Start the development server with `npm run dev`.
+
+Lightning checkout is test-only and disabled when `NODE_ENV=production`. Invoice keys stay on the server and must never be exposed to the browser.
 
 ---
 *Designed & engineered for a resilient marketplace experience with maximum clarity, uptime, and operational focus.*

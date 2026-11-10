@@ -23,7 +23,13 @@
 - `GET /inventory/api/discover` : Discover and search marketplace products. Auth required: Yes
 
 ## Orders Module
-- `POST /orders/create` : Create a new order for a buyer checkout flow. Auth required: Yes
+- `GET /orders/cart` : Return the authenticated user’s server-priced cart. Auth required: Yes
+- `POST /orders/cart/items/:productId` : Add product quantity to the cart. Auth required: Yes
+- `PATCH /orders/cart/items/:productId` : Set product quantity in the cart. Auth required: Yes
+- `DELETE /orders/cart/items/:productId` : Remove a cart item. Auth required: Yes
+- `POST /orders/checkout` : Reserve stock, calculate totals, and create a test Lightning invoice. Auth required: Yes
+- `GET /orders/:id/checkout` : Render the buyer’s Lightning invoice and payment status. Auth required: Yes
+- `GET /orders/:id/status` : Verify invoice payment with LNbits. Auth required: Yes
 - `GET /orders/my-orders` : Return the authenticated buyer’s order history. Auth required: Yes
 - `GET /orders/shop-orders` : Return orders for a shop managed by the authenticated seller. Auth required: Yes
 - `POST /orders/:id/status` : Update the status of an order for the authenticated seller. Auth required: Yes
